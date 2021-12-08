@@ -3,11 +3,13 @@ import discord
 from discord import client
 from discord import embeds
 from discord import user
+from discord import colour
 from discord.colour import Color
 from discord.ext import commands
 import json
 import os
 import random
+
 
 os.chdir("C:\\Users\\maxsk\\OneDrive\\เดสก์ท็อป\\Project")
 
@@ -123,7 +125,6 @@ async def bet(mackngo): #เสี่ยงดวง
     with open("bank.json", "w") as f:
         json.dump(users, f)
 
-
 @client.command()
 async def guess(mackngo): #เสี่ยงดวง
     await open_account(mackngo.author)
@@ -187,18 +188,21 @@ async def rank(ctx):
     mylist = []
     with open("bank.json", "r") as f:
         user = json.load(f)
-    j = 0
+    
     for i in user:
         bal = [users[str(i)]["wallet"], users[str(i)]["bank"]]
         bals = bal[0] + bal[1]
         mylist.append([bals, str(i)])
         bal.clear()
     mylist.sort(reverse=True)
-    for i in mylist:
-        usersort = await client.fetch_user(i[1])
-        j += 1
-        await ctx.send(("อันดับที่ %d  " %j) + str(usersort) + "           " + str(i[0]) + " Coins")
-
+    gak = discord.Embed(title = "Rank", color = discord.Color.magenta())
+    usersort = await client.fetch_user(mylist[0][1])
+    usersort2 = await client.fetch_user(mylist[1][1])
+    usersort3 = await client.fetch_user(mylist[2][1])
+    gak.add_field(name="อันดับ", value = "1\n2\n3")
+    gak.add_field(name="user", value = "%s\n%s\n%s" %(str(usersort)[:-5],str(usersort2)[:-5],str(usersort3)[:-5]))
+    gak.add_field(name="Coins", value= "%s\n%s\n%s" %(mylist[0][0],mylist[1][0],mylist[2][0]))
+    await ctx.send(embed = gak)
 async def update_bank(user, change=0, mode="wallet"):
     users = await databank()
 
@@ -210,4 +214,4 @@ async def update_bank(user, change=0, mode="wallet"):
     bal = [users[str(user.id)]["wallet"], users[str(user.id)]["bank"]]
     return bal
 
-client.run('OTA5NDE2OTc1MzI1ODc2Mjk3.YZD-jw.MBGOqNzbwbq2Vi398CEF_d1dQdc')
+client.run('OTE2NzA4NDk4ODg3MzAzMjA5.YauFUQ.gkw852vP-c6nBdbJUV0_l0NSNXs')
