@@ -33,6 +33,11 @@ async def balance(mackngo): #เช็กยอดคงเหลือ
     em.add_field(name="Bank balance", value=bank_amt)
     await mackngo.send(embed = em)
 
+#@client.command()
+#    asyasync def fxcku(ctx, member:discord.Member):
+#    cursing = [ลิสต์คำด่า uwu]
+#    await ctx.send(@member:discord.Member, random.choice(cursing))
+
 @client.command()
 async def send(ctx, member:discord.Member, amount = None): #โอนเงิน
     await open_account(ctx.author)
