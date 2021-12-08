@@ -104,7 +104,7 @@ async def deposit(mackngo, amount = None): #ฝากเงิน
     await mackngo.send(f"You deposited {amount} coins!")
 
 @client.command()
-async def bet(mackngo): #เสี่ยงดวง
+async def bet(mackngo): #เสี่ยงดวงขอเงินฟรีๆ
     await open_account(mackngo.author)
 
     users = await databank()
@@ -126,7 +126,7 @@ async def bet(mackngo): #เสี่ยงดวง
         json.dump(users, f)
 
 @client.command()
-async def guess(mackngo): #เสี่ยงดวง
+async def guess(mackngo): #เกมสุ่มทายตัวเลข
     await open_account(mackngo.author)
     users = await databank()
     user = mackngo.author
@@ -177,13 +177,13 @@ async def open_account(user): #เปิดบัญชี
         json.dump(users, f)
     return True
 
-async def databank():
+async def databank(): #ดึงข้อมูลแต่ละบัญชีจาก mainbank.json
     with open("bank.json", "r") as f:
         users = json.load(f)
 
     return users
 @client.command()
-async def rank(ctx):
+async def rank(ctx): #แสดงบัญชีที่ยอดเงินมากที่สุด 3 อันดับแรก
     users = await databank()
     mylist = []
     with open("bank.json", "r") as f:
@@ -203,7 +203,8 @@ async def rank(ctx):
     gak.add_field(name="user", value = "%s\n%s\n%s" %(str(usersort)[:-5],str(usersort2)[:-5],str(usersort3)[:-5]))
     gak.add_field(name="Coins", value= "%s\n%s\n%s" %(mylist[0][0],mylist[1][0],mylist[2][0]))
     await ctx.send(embed = gak)
-async def update_bank(user, change=0, mode="wallet"):
+
+async def update_bank(user, change=0, mode="wallet"): #อัพเดตยอดเงินในบัญชีเข้า mainbank.json
     users = await databank()
 
     users[str(user.id)][mode] += change
