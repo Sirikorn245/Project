@@ -282,7 +282,12 @@ async def quiz(ctx):
         ask = json.load(f)
     question = random.choice(list(ask.keys()))
     ans = ask[question][2]
-    await ctx.send('%s\n1) %s\n2) %s' %(question, ask[question][0], ask[question][1]))
+    
+    em = discord.Embed(title = question, color = discord.Color.lighter_grey())
+    em.add_field(name="1)", value=ask[question][0])
+    em.add_field(name="2)", value=ask[question][1])
+    await ctx.send(embed = em)
+    
     ansuser = await client.wait_for("message")
     if ansuser.content == '1':
         answer = ask[question][0]
