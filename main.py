@@ -142,7 +142,8 @@ async def rps(mackngo):
             await message.add_reaction("🔨")
             await message.add_reaction("✂️")
             await message.add_reaction("📄")
-            number = random.randint(0,4)
+            number = random.randint(0,3)
+            print(number)
             ans = ["Rock", "Paper", "Scissors", "My Love"]
             check = lambda r, u: u == mackngo.author and str(r.emoji) in "🔨✂️📄"
             try:
@@ -247,6 +248,7 @@ async def guess(mackngo): #เสี่ยงดวง
             json.dump(users, f)
     gak = discord.Embed(title = f"ตอนนี้คุณ {mackngo.author.name}'s", color = discord.Color.dark_gold())
     gak.add_field(name= "มีเงินทั้งหมด", value= users[str(user.id)]["wallet"])
+    gak.set_image(url="https://i.pinimg.com/originals/c6/e7/91/c6e7913a6ee055acf1ce60084968f40c.png")
     await mackngo.send(embed = gak)
 
 async def open_account(user): #เปิดบัญชี
@@ -301,4 +303,4 @@ async def update_bank(user, change=0, mode="wallet"):
     bal = [users[str(user.id)]["wallet"], users[str(user.id)]["bank"]]
     return bal
 
-client.run('OTE2NzA4NDk4ODg3MzAzMjA5.YauFUQ.lDoIWlba29g4m0NcO38OF3DVM9A')
+client.run('OTE2NzA4NDk4ODg3MzAzMjA5.YauFUQ.ooqkZmMyhnzJtSwqUdLYmnZcAMs')
