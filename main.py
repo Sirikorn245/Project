@@ -282,18 +282,22 @@ async def quiz(ctx):
         ask = json.load(f)
     question = random.choice(list(ask.keys()))
     ans = ask[question][2]
-    await ctx.send('%s\n1) %s\n2) %s' %(question, ask[question][0], ask[question][1]))
+    
+    em = discord.Embed(title = 'Question', color = discord.Color.lighter_grey())
+    em.add_field(name=question, value= '**1) ** %s\n**2) ** %s' %(ask[question][0], ask[question][1]))
+    await ctx.send(embed = em)
+    
     ansuser = await client.wait_for("message")
     if ansuser.content == '1':
         answer = ask[question][0]
     if ansuser.content == '2':
         answer = ask[question][1]
     if ans == answer:
-        await ctx.send("ถูกต้องนะคร้าบบบบบ")
+        em = discord.Embed(title = 'ถูกต้องนะคร้าบบบบบ', color = discord.Color.green())
+        await ctx.send(embed = em)
     else:
-        await ctx.send("ทำไมโง่อ่า ตอบ %s ตะหาก" %(ans))
-    
-    
+        em = discord.Embed(title = 'ทำไมโง่อ่า ตอบ %s ตะหาก' %(ans), color = discord.Color.red())
+        await ctx.send(embed = em)
 
 @client.command()
 async def addquiz(ctx):
