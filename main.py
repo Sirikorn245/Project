@@ -143,7 +143,6 @@ async def rps(mackngo):
             await message.add_reaction("✂️")
             await message.add_reaction("📄")
             number = random.randint(0,3)
-            print(number)
             ans = ["Rock", "Paper", "Scissors", "My Love"]
             check = lambda r, u: u == mackngo.author and str(r.emoji) in "🔨✂️📄"
             try:
@@ -248,7 +247,6 @@ async def guess(mackngo): #เสี่ยงดวง
             json.dump(users, f)
     gak = discord.Embed(title = f"ตอนนี้คุณ {mackngo.author.name}'s", color = discord.Color.dark_gold())
     gak.add_field(name= "มีเงินทั้งหมด", value= users[str(user.id)]["wallet"])
-    gak.set_image(url="https://i.pinimg.com/originals/c6/e7/91/c6e7913a6ee055acf1ce60084968f40c.png")
     await mackngo.send(embed = gak)
 
 async def open_account(user): #เปิดบัญชี
@@ -271,6 +269,49 @@ async def databank():
         users = json.load(f)
 
     return users
+
+@client.command()
+async def test(ctx):
+    embed = discord.Embed(color=0x00ff00) #creates embed
+    embed.set_image(url="https://lh3.googleusercontent.com/HBrh0QUd2MjeFDiEi_epX4Pq5ChH3kgpqxIbr-BxaiX5PYSHnZmqvrAY2ArBaoJ3IM2aeg=s85")
+    await ctx.send(embed=embed)
+
+@client.command()
+async def quiz(ctx):
+    with open("allquestion.json", "r") as f:
+        ask = json.load(f)
+    question = random.choice(list(ask.keys()))
+    ans = ask[question][2]
+    await ctx.send('%s\n1) %s\n2) %s' %(question, ask[question][0], ask[question][1]))
+    ansuser = await client.wait_for("message")
+    if ansuser.content == '1':
+        answer = ask[question][0]
+    if ansuser.content == '2':
+        answer = ask[question][1]
+    if ans == answer:
+        await ctx.send("ถูกต้องนะคร้าบบบบบ")
+    else:
+        await ctx.send("ทำไมโง่อ่า ตอบ %s ตะหาก" %(ans))
+    
+    
+
+@client.command()
+async def addquiz(ctx):
+    await ctx.send("ระบุคำถาม")
+    quiz = await client.wait_for("message")
+    await ctx.send("ระบุตัวเลือกที่ 1")
+    ch1 = await client.wait_for("message")
+    await ctx.send("ระบุตัวเลือกที่ 2")
+    ch2 = await client.wait_for("message")
+    await ctx.send("ระบุคำตอบ")
+    ans = await client.wait_for("message")
+    with open("allquestion.json", "r") as f:
+        allquiz = json.load(f)
+    allquiz.update({quiz.content: [ch1.content, ch2.content, ans.content]})
+    json.dump(allquiz, open("allquestion.json", "w"))
+
+
+    
 @client.command()
 async def rank(ctx):
     users = await databank()
@@ -303,4 +344,4 @@ async def update_bank(user, change=0, mode="wallet"):
     bal = [users[str(user.id)]["wallet"], users[str(user.id)]["bank"]]
     return bal
 
-client.run('OTE2NzA4NDk4ODg3MzAzMjA5.YauFUQ.ooqkZmMyhnzJtSwqUdLYmnZcAMs')
+client.run('OTE2NzA4NDk4ODg3MzAzMjA5.YauFUQ.lW8KtI1zd3HGuFVnNI08zb9HGMw')
