@@ -1,4 +1,5 @@
-from re import M
+import asyncio
+from re import A, M, T
 import discord
 from discord import client
 from discord import embeds
@@ -126,6 +127,92 @@ async def bet(mackngo): #เสี่ยงดวง
         json.dump(users, f)
 
 @client.command()
+async def rps(mackngo):
+    await open_account(mackngo.author)
+    users = await databank()
+    user = mackngo.author
+    await mackngo.send("ต้องการลงเดิมพันเท่าไหร่")
+    bet = await client.wait_for("message")
+    lostmoney = int(bet.content) *2
+    if int(bet.content) > users[str(user.id)]["wallet"]:
+        await mackngo.send("ยอดเงินคุณไม่เพียงพอที่จะลงเดิมพัน")
+    else:
+        while True:
+            message = await mackngo.send("เป่า ยิ้ง ฉุบบ")
+            await message.add_reaction("🔨")
+            await message.add_reaction("✂️")
+            await message.add_reaction("📄")
+            number = random.randint(0,4)
+            ans = ["Rock", "Paper", "Scissors", "My Love"]
+            check = lambda r, u: u == mackngo.author and str(r.emoji) in "🔨✂️📄"
+            try:
+                reaction, user = await client.wait_for("reaction_add", check= check, timeout=60)
+            except asyncio.TimeoutError:
+                await mackngo.send("ช้าไปป่าวน้องง")
+            if str(reaction.emoji) == "🔨":
+                await mackngo.send("ฉันจะออกอะไรดีน้าาาา")
+                if ans[number] == "Rock":
+                    await mackngo.send("ฉันจะออก", file=discord.File("Rock.png"))
+                    await mackngo.send("เสมอจ้าเอาใหม่อีกครั้งนะ")
+                elif ans[number] == "Paper":
+                    await mackngo.send("ฉันจะออก", file=discord.File("paper.png"))
+                    await mackngo.send("ยินดีด้วยคุณได้รับเงิน %d Coins" %lostmoney)
+                    users[str(user.id)]["wallet"] += lostmoney
+                    break
+                elif ans[number] == "My Love":
+                    await mackngo.send("เสียใจด้วยนะแต่ความรักของฉันจะชนะทุกอย่าง", file=discord.File("Mylove.png"))
+                    users[str(user.id)]["wallet"] -= lostmoney / 2
+                    break
+                else:
+                    await mackngo.send("ฉันจะออก", file=discord.File("scissors.png"))
+                    await mackngo.send("ยินดีด้วยคุณเสียเงิน %d Coins" %lostmoney)
+                    users[str(user.id)]["wallet"] -= lostmoney / 2
+                    break
+            elif str(reaction.emoji) == "✂️":
+                await mackngo.send("ฉันจะออกอะไรดีน้าาาา")
+                if ans[number] == "Rock":
+                    await mackngo.send("ฉันจะออก", file=discord.File("Rock.png"))
+                    await mackngo.send("ยินดีด้วยคุณได้เสียเงิน %d Coins" %lostmoney)
+                    users[str(user.id)]["wallet"] -= lostmoney
+                    break
+                elif ans[number] == "Paper":
+                    await mackngo.send("ฉันจะออก", file=discord.File("paper.png"))
+                    await mackngo.send("ยินดีด้วยคุณได้รับเงิน %d Coins" %lostmoney)
+                    users[str(user.id)]["wallet"] += lostmoney / 2
+                    break
+                elif ans[number] == "My Love":
+                    await mackngo.send("เสียใจด้วยนะแต่ความรักของเราจะชนะทุกอย่าง", file=discord.File("Mylove.png"))
+                    users[str(user.id)]["wallet"] -= lostmoney / 2
+                    break
+                else:
+                    await mackngo.send("ฉันจะออก", file=discord.File("scissors.png"))
+                    await mackngo.send("เสมอจ้าเอาใหม่อีกครั้งนะ")
+            else:
+                await mackngo.send("ฉันจะออกอะไรดีน้าาาา")
+                if ans[number] == "Rock":
+                    await mackngo.send("ฉันจะออก", file=discord.File("Rock.png"))
+                    await mackngo.send("ยินดีด้วยคุณได้เสียเงิน %d Coins" %lostmoney)
+                    users[str(user.id)]["wallet"] -= lostmoney / 2
+                    break
+                elif ans[number] == "Paper":
+                    await mackngo.send("ฉันจะออก", file=discord.File("paper.png"))
+                    await mackngo.send("เสมอจ้าเอาใหม่อีกครั้งนะ")
+                elif ans[number] == "My Love":
+                    await mackngo.send("เสียใจด้วยนะแต่ความรักของเราจะชนะทุกอย่าง", file=discord.File("Mylove.png"))
+                    users[str(user.id)]["wallet"] -= lostmoney / 2
+                    break
+                else:
+                    await mackngo.send("ฉันจะออก", file=discord.File("scissors.png"))
+                    await mackngo.send("ยินดีด้วยคุณได้รับเงิน %d Coins" %lostmoney)
+                    users[str(user.id)]["wallet"] += lostmoney
+                    break
+    with open("bank.json", "w") as f:
+        json.dump(users, f)
+    gak = discord.Embed(title = f"ตอนนี้คุณ {mackngo.author.name}'s", color = discord.Color.dark_gold())
+    gak.add_field(name= "มีเงินทั้งหมด", value= users[str(user.id)]["wallet"])
+    await mackngo.send(embed = gak)
+
+@client.command()
 async def guess(mackngo): #เสี่ยงดวง
     await open_account(mackngo.author)
     users = await databank()
@@ -214,4 +301,4 @@ async def update_bank(user, change=0, mode="wallet"):
     bal = [users[str(user.id)]["wallet"], users[str(user.id)]["bank"]]
     return bal
 
-client.run('OTE2NzA4NDk4ODg3MzAzMjA5.YauFUQ.gkw852vP-c6nBdbJUV0_l0NSNXs')
+client.run('OTE2NzA4NDk4ODg3MzAzMjA5.YauFUQ.lDoIWlba29g4m0NcO38OF3DVM9A')
