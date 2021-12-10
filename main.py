@@ -127,7 +127,7 @@ async def bet(mackngo): #เสี่ยงดวง
         json.dump(users, f)
 
 @client.command()
-async def rps(mackngo):
+async def rps(mackngo):  #เป่ายิ้งฉุบ
     await open_account(mackngo.author)
     users = await databank()
     user = mackngo.author
@@ -213,7 +213,7 @@ async def rps(mackngo):
     await mackngo.send(embed = gak)
 
 @client.command()
-async def guess(mackngo): #เสี่ยงดวง
+async def guess(mackngo): #เกมทายเลข
     await open_account(mackngo.author)
     users = await databank()
     user = mackngo.author
@@ -264,12 +264,6 @@ async def open_account(user): #เปิดบัญชี
         json.dump(users, f)
     return True
 
-async def databank():
-    with open("bank.json", "r") as f:
-        users = json.load(f)
-
-    return users
-
 @client.command()
 async def test(ctx):
     embed = discord.Embed(color=0x00ff00) #creates embed
@@ -277,7 +271,11 @@ async def test(ctx):
     await ctx.send(embed=embed)
 
 @client.command()
-async def quiz(ctx):
+async def quiz(ctx): #เกมตอบคำถาม
+    await open_account(ctx.author)
+    users = await databank()
+    user = ctx.author
+    
     with open("allquestion.json", "r") as f:
         ask = json.load(f)
     question = random.choice(list(ask.keys()))
@@ -293,14 +291,15 @@ async def quiz(ctx):
     if ansuser.content == '2':
         answer = ask[question][1]
     if ans == answer:
-        em = discord.Embed(title = 'ถูกต้องนะคร้าบบบบบ', color = discord.Color.green())
+        em = discord.Embed(title = 'ถูกต้องนะคร้าบบบบบ รับไปเลย 10 coins', color = discord.Color.random())
         await ctx.send(embed = em)
+        users[str(user.id)]["wallet"] += 10
     else:
         em = discord.Embed(title = 'ทำไมโง่อ่า ตอบ %s ตะหาก' %(ans), color = discord.Color.red())
         await ctx.send(embed = em)
 
 @client.command()
-async def addquiz(ctx):
+async def addquiz(ctx): #เพิ่มโจทย์
     await ctx.send("ระบุคำถาม")
     quiz = await client.wait_for("message")
     await ctx.send("ระบุตัวเลือกที่ 1")
@@ -314,10 +313,31 @@ async def addquiz(ctx):
     allquiz.update({quiz.content: [ch1.content, ch2.content, ans.content]})
     json.dump(allquiz, open("allquestion.json", "w"))
 
+@client.command()
+async def slot(ctx): #สลอต
+    await open_account(ctx.author)
+    users = await databank()
+    user = ctx.author
 
+    emoji = ['🍎', '🍐', '🍊', '🍋', '🍉', '🍇', '🍓', '🥑', '🍑', '🌽', '🍆', '🥕', '🍍', '🌸', '🌻']
+    i, j, k = random.choice(emoji), random.choice(emoji), random.choice(emoji)
+    if i == j == k:
+        result = 'Congrats! You received 250 coins.'
+        users[str(user.id)]["wallet"] += 250
+    elif i != j and j != k and i != k:
+        result = 'Sorry, you lost 50 coins. How pathetic ;P'
+        users[str(user.id)]["wallet"] -= 50
+    else:
+        result = 'Unfortunately, you neither recived nor lost. Pls try again'
+    em = discord.Embed(title = 'Slot 🎰', color = discord.Color.random())
+    em.add_field(name='Reels', value= '**> > %s %s %s <**\nResult: *%s*' %(i, j, k, result))
+    await ctx.send(embed = em)
+    
+    with open("bank.json", "w") as f:
+        json.dump(users, f)
     
 @client.command()
-async def rank(ctx):
+async def rank(ctx): #แสดงบัญชีที่มียอดเงินสูงสุดสามคนแรก
     users = await databank()
     mylist = []
     with open("bank.json", "r") as f:
@@ -337,7 +357,14 @@ async def rank(ctx):
     gak.add_field(name="user", value = "%s\n%s\n%s" %(str(usersort)[:-5],str(usersort2)[:-5],str(usersort3)[:-5]))
     gak.add_field(name="Coins", value= "%s\n%s\n%s" %(mylist[0][0],mylist[1][0],mylist[2][0]))
     await ctx.send(embed = gak)
-async def update_bank(user, change=0, mode="wallet"):
+
+async def databank(): #ดึงข้อมูลจาก bank.json
+    with open("bank.json", "r") as f:
+        users = json.load(f)
+
+    return users
+    
+async def update_bank(user, change=0, mode="wallet"): #อัพเดตยอดเงินใน bank.json
     users = await databank()
 
     users[str(user.id)][mode] += change
